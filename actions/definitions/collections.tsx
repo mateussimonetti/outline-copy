@@ -177,6 +177,10 @@ export const starCollection = createAction({
     },
 });
 
+export const unstarrCollection = createAction({
+    name: ({ t }) => t("Unstar"),
+})
+
 
 
 
