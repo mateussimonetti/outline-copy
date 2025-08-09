@@ -100,3 +100,72 @@ export const openDocument = createAction({
     },
 });
 
+export const createDocument = createAction({
+    name: ({ t }) => t("New document"),
+    analyticsName: "New document",
+    section: DocumentSection,
+    icon: <NewDocumentIcon />,
+    keywords: "create",
+    visible: ({ currentTeamId, activeCollectionId, stores }) => {
+        if (
+            activeCollectionId &&
+            !stores.policies.abilities(activeCollectionId).createDocument
+        ) {
+            return false;
+        }
+
+        return (
+            !!currentTeamId && stores.policies.abilities(currentTeamId).createDocument
+        );
+    },
+    perform: ({ activeCollectionId, sidebarContext }) =>
+        history.push(newDocumentPath(activeCollectionId), { sidebarContext }),
+});
+
+export const createDraftDocument = createAction({
+    name: ({ t }) => t("New draft"),
+    analyticsName: "New draft",
+    section: DocumentSection,
+    icon: <NewDocumentIcon />,
+    keywords: "create document",
+    visible: ({ currentTeamId, stores }) =>
+        !!currentTeamId && stores.policies.abilities(currentTeamId).createDocument,
+    perform: ({ sidebarContext }) =>
+        history.push(newDocumentPath(), { sidebarContext }),
+});
+
+export const createDocumentFromTemplate = createAction({
+    name: ({ t }) => t("New from template"),
+    analyticsName: "New from template",
+    section: DocumentSection,
+    icon: <NewDocumentIcon />,
+    keywords: "create",
+    visible: ({
+        currentTeamId,
+        activeCollectionId,
+        activeDocumentId,
+        stores
+    }) => {
+        const document = activeDocumentId
+            ? stores.documents.get(activeDocumentId)
+            : undefined;
+
+        if (
+            !currentTeamId ||
+            !document?.isTemplate ||
+            !!document?.isDraft ||
+            !!document?.isDeleted
+        ) {
+            return false;
+        }
+
+        if (activeCollectionId) {
+            return stores.policies.abilities(activeCollectionId).createDocument;
+        }
+        return stores.policies.abilities(currentTeamId).createDocument;
+    },
+    perform: ({ activeCollectionId, activeDocumentId, sidebarContext }) =>
+        history.push(newDocumentPath(activeCollectionId, { templateId: activeDocumentId }), { sidebarContext }),
+});
+
+
