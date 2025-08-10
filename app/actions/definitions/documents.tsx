@@ -168,4 +168,19 @@ export const createDocumentFromTemplate = createAction({
         history.push(newDocumentPath(activeCollectionId, { templateId: activeDocumentId }), { sidebarContext }),
 });
 
+export const createNestedDocument = createAction({
+    name: ({ t }) => t("New nested document"),
+    analyticsName: "New document",
+    section: ActiveDocumentSection,
+    icon: <NewDocumentIcon />,
+    keywords: "create",
+    visible: ({ currentTeamId, activeDocumentId, stores }) =>
+        !!currentTeamId &&
+        !!activeDocumentId &&
+        stores.policies.abilities(currentTeamId).createDocument &&
+        stores.policies.abilities(activeDocumentId).createChildDocument,
+    perform: ({ activeDocumentId, sidebarContext }) =>
+        history.push(newNestedDocumentPath(activeDocumentId), { sidebarContext }),
+});
+
 
